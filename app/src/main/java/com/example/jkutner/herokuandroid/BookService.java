@@ -13,7 +13,7 @@ public interface BookService {
     Call<List<Book>> all();
 
     @GET("books/{isbn}")
-    Call<Book> getUser(@Path("isbn") String isbn);
+    Call<Book> get(@Path("isbn") String isbn);
 
     @POST("books/new")
     Call<Book> create(@Body Book book);
