@@ -1,16 +1,23 @@
 package com.example.jkutner.herokuandroid;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.stormpath.sdk.Stormpath;
+import com.stormpath.sdk.StormpathCallback;
+import com.stormpath.sdk.StormpathConfiguration;
+import com.stormpath.sdk.models.StormpathError;
+
 import java.io.IOException;
 import java.util.List;
 
-import okhttp3.ResponseBody;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -36,9 +43,36 @@ public class MainActivity extends AppCompatActivity {
         viewAllButton = (Button) findViewById(R.id.viewAllButton);
         allBooks = (TextView) findViewById(R.id.allBooks);
 
+        String baseUrl = "https://shrouded-brook-35188.herokuapp.com";
+        StormpathConfiguration stormpathConfiguration = new StormpathConfiguration.Builder()
+                .baseUrl(baseUrl)
+                .build();
+        Stormpath.init(this, stormpathConfiguration);
+
+        Stormpath.login("foo@bar.com", "Pa55word", new StormpathCallback<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) { }
+
+            @Override
+            public void onFailure(StormpathError error) { }
+        });
+
+        OkHttpClient httpClient = new OkHttpClient.Builder()
+                .addInterceptor(new Interceptor() {
+                    @Override
+                    public okhttp3.Response intercept(Chain chain) throws IOException {
+                        Request.Builder ongoing = chain.request().newBuilder();
+                        System.out.println("token: " + Stormpath.getAccessToken());
+                        ongoing.addHeader("Accept", "application/json");
+                        ongoing.addHeader("Authorization", "Bearer " + Stormpath.getAccessToken());
+                        return chain.proceed(ongoing.build());
+                    }
+                }).build();
+
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://limitless-inlet-33234.herokuapp.com")
+                .baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
+                .client(httpClient)
                 .build();
 
         final BookService service = retrofit.create(BookService.class);
