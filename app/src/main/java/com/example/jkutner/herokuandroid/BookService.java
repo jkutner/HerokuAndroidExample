@@ -5,6 +5,7 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 
@@ -13,7 +14,7 @@ public interface BookService {
     Call<List<Book>> all();
 
     @GET("books/{isbn}")
-    Call<Book> get(@Path("isbn") String isbn);
+    Call<Book> get(@Header("Authorization") @Path("isbn") String isbn);
 
     @POST("books/new")
     Call<Book> create(@Body Book book);

@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         allBooks = (TextView) findViewById(R.id.allBooks);
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://2d34cd05.ngrok.io")
+                .baseUrl("http://limitless-inlet-33234.herokuapp.com")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
